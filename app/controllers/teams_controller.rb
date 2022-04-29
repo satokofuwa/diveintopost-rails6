@@ -2,6 +2,7 @@ class TeamsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_team, only: %i[show edit update destroy]
 
+
   def index
     @teams = Team.all
   end
@@ -39,8 +40,10 @@ class TeamsController < ApplicationController
   end
 
   def destroy
+    if current_user.keep_team_id? || current_user.id?
     @team.destroy
     redirect_to teams_url, notice: I18n.t('views.messages.delete_team')
+    end
   end
 
   def dashboard
