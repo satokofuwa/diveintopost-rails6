@@ -3,7 +3,7 @@ class AssignMailer < ApplicationMailer
 
   def assign_mail(email)
     @email = email
-  
+
     mail to: @email, subject: I18n.t('views.messages.change_authority_comment')
   end
 end
