@@ -1,5 +1,5 @@
 class AgendasController < ApplicationController
-  # before_action :set_agenda, only: %i[show edit update destroy]
+  before_action :set_agenda, only: %i[show edit update]
 
   def index
     @agendas = Agenda.all
@@ -18,6 +18,21 @@ class AgendasController < ApplicationController
       redirect_to dashboard_url, notice: I18n.t('views.messages.create_agenda')
     else
       render :new
+    end
+  end
+
+  def destroy
+    @agenda = Agenda.find(params[:id])
+    if current_user.id == @agenda.user_id || current_user.id == @agenda.team.owner_id
+      @agenda.destroy
+      redirect_to dashboard_url, notice: I18n.t('views.messages.destroy_agenda')
+      @keep_team_id = @agenda.team_id
+      @user_emails = User.where(keep_team_id: @keep_team_id).pluck(:email)
+      @user_emails.each do |emails|
+        AgendaMailer.agenda_mail(emails).deliver
+      end
+    else
+      redirect_to dashboard_url, notice: "権限がないため削除できません。"
     end
   end
 
